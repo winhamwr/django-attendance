@@ -1,1 +1,20 @@
 {% extends "django_attendance/base.html" %}
+{% load i18n %}
+
+{% block body %}
+<h2 align="center">Attendees for {{ occurrence.title }}</h2>
+{% if occurrence.description %}
+<p><strong>{{occurrence.description}}</strong></p>
+{% endif %}
+<p><em>{% blocktrans with occurrence.start|date:_("DATETIME_FORMAT") as start_date %}{{ start_date }}{% endblocktrans %}</em> <strong>through</strong> <em>{% blocktrans with occurrence.end|date:_("DATETIME_FORMAT") as end_date %}{{ end_date }}{% endblocktrans %}</em></p>
+
+<h3>Attendees:</h3>
+    <ul>
+    {% for attendee in attendees %}
+        <li>{{ attendee.last_name|default:attendee }}, {{ attendee.first_name }}</li>
+    {% endfor %}
+    </ul>
+{% if perms.django_attendance.can_change_attendance %}
+<a href="{% url admin:django_attendance_eventattendance_change occurrence.eventattendance.pk %}">Modify Attendance</a>
+{% endif %}
+{% endblock %}

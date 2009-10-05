@@ -12,7 +12,7 @@ class EventAttendance(models.Model):
     The attendance status of a user for a specific Occurrence of an event.
     '''
     occurrence = models.OneToOneField(Occurrence)
-    attendee_statuses = models.ManyToManyField(User, through='AttendanceStatus')
+    attendees = models.ManyToManyField(User)
 
     class Meta:
         verbose_name = _('attendance')
@@ -23,25 +23,4 @@ class EventAttendance(models.Model):
                                          self.occurrence.start)
 
 
-class AttendanceStatus(models.Model):
-    event_attendance = models.ForeignKey(EventAttendance)
-    user = models.ForeignKey(User)
-    attended = models.BooleanField(default=False)
-
-    attendance_recorded_date = models.DateTimeField(default=datetime.datetime.now)
-
-    def __unicode__(self):
-        return "Attendance status for %s at %s-%s" % (self.user,
-                                                      self.event_attendance.occurrence.title,
-                                                      self.event_attendance.occurrence.start)
-
-class AttendanceStatusInline(admin.StackedInline):
-    model = AttendanceStatus
-    exclude = ('attendance_recorded_date',)
-    extra = 5
-
-class EventAttendanceAdmin(admin.ModelAdmin):
-    inlines = [AttendanceStatusInline]
-
-
-admin.site.register(EventAttendance, EventAttendanceAdmin)
+admin.site.register(EventAttendance)

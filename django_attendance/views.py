@@ -5,11 +5,22 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
+from schedule.models import Occurrence
 from schedule.views import get_occurrence
 
-def attendance(request, occurrence_id, template_name='django_attendance/attendance.html'):
+from django_attendance.models import EventAttendance
 
-    context = RequestContext(request)
+def attendance(request, occurrence_id, template_name='django_attendance/attendance.html'):
+    occurrence = get_object_or_404(Occurrence, pk=occurrence_id)
+    try:
+        ea = occurrence.eventattendance
+    except EventAttendance.DoesNotExist:
+        ea = EventAttendance(occurrence=occurrence)
+        ea.save()
+
+    attendees = ea.attendees.all().order_by('last_name')
+    context = RequestContext(request, {'occurrence': occurrence,
+                                       'attendees': attendees})
 
     return render_to_response(template_name, context)
 
