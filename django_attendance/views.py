@@ -5,13 +5,14 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 
 from schedule.models import Occurrence
 from schedule.views import get_occurrence
 
 from django_attendance.models import EventAttendance
 
+@login_required
 def attendance(request, occurrence_id, template_name='django_attendance/attendance.html'):
     occurrence = get_object_or_404(Occurrence, pk=occurrence_id)
     try:
