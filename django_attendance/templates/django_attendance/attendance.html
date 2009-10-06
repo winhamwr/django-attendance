@@ -16,5 +16,7 @@
     </ul>
 {% if perms.django_attendance.can_change_attendance %}
 <a href="{% url admin:django_attendance_eventattendance_change occurrence.eventattendance.pk %}">Modify Attendance</a>
+<br />
+<a href="{% url attendance_signup occurrence_id=occurrence.pk %}">Event Signup</a>
 {% endif %}
 {% endblock %}

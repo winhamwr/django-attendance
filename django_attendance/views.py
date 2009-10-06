@@ -4,6 +4,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import permission_required
 
 from schedule.models import Occurrence
 from schedule.views import get_occurrence
@@ -24,12 +26,30 @@ def attendance(request, occurrence_id, template_name='django_attendance/attendan
 
     return render_to_response(template_name, context)
 
+@permission_required('django_attendance.can_change_attendance')
 def signup(request, occurrence_id, template_name='django_attendance/signup.html'):
     """
     A signup page where site members can enter their username and password and
     be marked as attending the event.
     """
-    context = RequestContext(request)
+    occurrence = get_object_or_404(Occurrence, pk=occurrence_id)
+
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            # Sign this user up
+            ea, created = EventAttendance.objects.get_or_create(occurrence=occurrence)
+            ea.save()
+            ea.attendees.add(user)
+
+            request.user.message_set.create(message="User %s %s successfully signed up" % (user.first_name, user.last_name))
+
+            return HttpResponseRedirect(reverse('attendance_signup', kwargs={'occurrence_id':occurrence.pk}))
+    else:
+        form = AuthenticationForm(request)
+
+    context = RequestContext(request, {'form':form})
 
     return render_to_response(template_name, context)
 

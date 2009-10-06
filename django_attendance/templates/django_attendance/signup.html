@@ -1,1 +1,17 @@
 {% extends "django_attendance/base.html" %}
+
+{% load i18n %}
+{% load uni_form %}
+{% load ifsetting_tag %}
+
+{% block body %}
+<h2 align="center">Sign In For {{ occurrence.title }}</h2>
+<form class="login uniForm" method="POST" action="">
+    <fieldset class="inlineLabels">
+        {{ form|as_uni_form }}
+        <div class="form_block">
+            <input type="submit" value="{% trans "Sign In &raquo;" %}" />
+        </div>
+    </fieldset>
+</form>
+{% endblock %}
