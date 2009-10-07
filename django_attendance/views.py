@@ -27,7 +27,7 @@ def attendance(request, occurrence_id, template_name='django_attendance/attendan
 
     return render_to_response(template_name, context)
 
-@permission_required('django_attendance.can_change_attendance')
+@permission_required('django_attendance.change_eventattendance')
 def signup(request, occurrence_id, template_name='django_attendance/signup.html'):
     """
     A signup page where site members can enter their username and password and
