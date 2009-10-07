@@ -14,7 +14,7 @@
         <li>{{ attendee.last_name|default:attendee }}, {{ attendee.first_name }}</li>
     {% endfor %}
     </ul>
-{% if perms.django_attendance.can_change_attendance %}
+{% if perms.django_attendance.change_eventattendance %}
 <a href="{% url admin:django_attendance_eventattendance_change occurrence.eventattendance.pk %}">Modify Attendance</a>
 <br />
 <a href="{% url attendance_signup occurrence_id=occurrence.pk %}">Event Signup</a>
