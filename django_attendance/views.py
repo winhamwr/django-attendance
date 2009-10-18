@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -26,6 +27,27 @@ def attendance(request, occurrence_id, template_name='django_attendance/attendan
                                        'attendees': attendees})
 
     return render_to_response(template_name, context)
+
+@login_required
+def user_attendance(request, user_id, template_name='django_attendance/user_attendance.html'):
+    """
+    An attendance report for a specific user. Displays the hours for a given user
+    broken down by event with summaries.
+    """
+    attendee = get_object_or_404(User, pk=user_id)
+
+    attended_occurrences = Occurrence.objects.filter(eventattendance__attendees=attendee).select_related('eventattendance').order_by('start')
+
+    total_hours = sum([a.eventattendance.duration() for a in attended_occurrences])
+
+    context = RequestContext(request, dict(
+        attended_occurrences=attended_occurrences,
+        total_hours=total_hours,
+        attendee=attendee
+    ))
+
+    return render_to_response(template_name, context)
+
 
 @permission_required('django_attendance.change_eventattendance')
 def signup(request, occurrence_id, template_name='django_attendance/signup.html'):
