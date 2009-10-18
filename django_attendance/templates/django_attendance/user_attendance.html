@@ -13,7 +13,9 @@
 {% block body %}
 <h2 align="center">Attendance Summary for {{ attendee }} </h2>
 
+{% for cal, occurrences, total_hours in cal_data %}
 <table class="data">
+	<caption><strong>{{ cal }}</strong></caption>
     <thead>
         <tr>
             <th>Date</th>
@@ -22,7 +24,7 @@
         </tr>
     </thead>
     <tbody>
-    {% for o in attended_occurrences %}
+    {% for o in occurrences %}
     <tr>
         <td>{{ o.start|date:"m-d-Y" }}</td>
         <td><a class="event_link" href="#" title="{{ o.event.title }}" target="{{ o.get_absolute_url }}">{{ o.event.title }}</a></td>
@@ -36,6 +38,7 @@
         <td><em>{{ total_hours }}</em></td>
     </tfoot>
 </table>
+{% endfor %}
 <script type="text/javascript">
     $(document).ready(function() {
 		$('a.event_link').click(function() {

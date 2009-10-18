@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import permission_required, login_required
 
-from schedule.models import Occurrence
+from schedule.models import Occurrence, Calendar
 from schedule.views import get_occurrence
 
 from django_attendance.models import EventAttendance
@@ -36,13 +36,16 @@ def user_attendance(request, user_id, template_name='django_attendance/user_atte
     """
     attendee = get_object_or_404(User, pk=user_id)
 
-    attended_occurrences = Occurrence.objects.filter(eventattendance__attendees=attendee).select_related('eventattendance').order_by('start')
-
-    total_hours = sum([a.eventattendance.duration() for a in attended_occurrences])
+    # 3-tuple of (calendar, occurrences and total_hours)
+    cal_data = []
+    for calendar in Calendar.objects.all():
+        attended_occurrences = Occurrence.objects.filter(eventattendance__attendees=attendee, event__calendar=calendar).select_related('eventattendance').order_by('start')
+        total_hours = sum([a.eventattendance.duration() for a in attended_occurrences])
+        if total_hours > 0:
+            cal_data.append((calendar, attended_occurrences, total_hours))
 
     context = RequestContext(request, dict(
-        attended_occurrences=attended_occurrences,
-        total_hours=total_hours,
+        cal_data=cal_data,
         attendee=attendee
     ))
 
