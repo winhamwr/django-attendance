@@ -11,32 +11,31 @@
 {% endblock %}
 
 {% block body %}
-<h2 align="center">Attendance Summary for {{ attendee }} </h2>
+<h2 align="center">Attendance Summary </h2>
 
-{% for cal, occurrences, total_hours in cal_data %}
+{% for cal, occurrences, user_hours in cal_data %}
 <table class="data">
 	<caption><strong>{{ cal }}</strong></caption>
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Event</th>
-            <th>Hours</th>
+			<th>Member</th>
+		{% for o in occurrences %}
+            <th>{{ o.start|date:"m-d-Y" }}: <a class="event_link" target="{{ o.get_absolute_url }}" href="#">{{ o.title }}</a></th>
+		{% endfor %}
+            <th>Total Hours</th>
         </tr>
     </thead>
     <tbody>
-    {% for o in occurrences %}
+    {% for user, hours, total_hours in user_hours %}
     <tr>
-        <td>{{ o.start|date:"m-d-Y" }}</td>
-        <td><a class="event_link" href="#" title="{{ o.event.title }}" target="{{ o.get_absolute_url }}">{{ o.event.title }}</a></td>
-        <td>{{ o.eventattendance.duration }}</td>
+        <th><a href="{% url attendance_for_user user_id=user.pk %}">{{ user }}</a></td>
+		{% for hour in hours %}
+        <td>{{ hour }}</td>
+		{% endfor %}
+		<td><em>{{ total_hours }}</em></td>
     </tr>
     {% endfor %}
     </tbody>
-    <tfoot>
-        <th>Total:</th>
-        <th>&nbsp;</th>
-        <td><em>{{ total_hours }}</em></td>
-    </tfoot>
 </table>
 {% endfor %}
 <div class="event_dialog"></div>

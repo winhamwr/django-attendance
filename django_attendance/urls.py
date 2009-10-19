@@ -17,8 +17,14 @@ url(r'^(?P<event_id>\d+)/(?P<iso_date>[-:\w]+)/signup/$',
     name="attendance_signup_by_iso_date"),
 
 # Reports
-url(r'^user/(?P<user_id>\d+)/$',
+url(r'^mine/$',
+    'user_attendance',
+    name="attendance_mine"),
+url(r'^user/(?P<user_id>\d+)/report/$',
     'user_attendance',
     name="attendance_for_user"),
+url(r'^user/report/$',
+    'attendance_by_user',
+    name="attendance_by_user"),
 
 )

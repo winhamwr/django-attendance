@@ -29,12 +29,15 @@ def attendance(request, occurrence_id, template_name='django_attendance/attendan
     return render_to_response(template_name, context)
 
 @login_required
-def user_attendance(request, user_id, template_name='django_attendance/user_attendance.html'):
+def user_attendance(request, user_id=None, template_name='django_attendance/user_attendance.html'):
     """
     An attendance report for a specific user. Displays the hours for a given user
     broken down by event with summaries.
     """
-    attendee = get_object_or_404(User, pk=user_id)
+    if user_id:
+        attendee = get_object_or_404(User, pk=user_id)
+    else:
+        attendee = request.user
 
     # 3-tuple of (calendar, occurrences and total_hours)
     cal_data = []
@@ -50,6 +53,44 @@ def user_attendance(request, user_id, template_name='django_attendance/user_atte
     ))
 
     return render_to_response(template_name, context)
+
+@login_required
+def attendance_by_user(request, template_name='django_attendance/attendance_by_user.html'):
+    """
+    An attendance report for a specific user. Displays the hours for a given user
+    broken down by event with summaries.
+    """
+    # 3-tuple of (calendar, occurrences, user_hours)
+    # ``user_hours`` is a 3-tuple of (user, [hours], total_hours) where hours is a ordered list
+    # of the hours for that user in the corresponding occurrences
+    cal_data = []
+    for calendar in Calendar.objects.all():
+        attended_occurrences = Occurrence.objects.filter(
+            event__calendar=calendar).exclude(
+                eventattendance__attendees__isnull=True).select_related(
+                    'eventattendance').order_by('start')
+
+        user_hours = []
+        for attendee in User.objects.all():
+            user_attended_occurrences = attended_occurrences.filter(eventattendance__attendees=attendee)
+            total_hours = sum([a.eventattendance.duration() for a in user_attended_occurrences])
+            if total_hours > 0:
+                hours = []
+                for o in attended_occurrences:
+                    if o in user_attended_occurrences:
+                        hours.append(o.eventattendance.duration())
+                    else:
+                        hours.append(0)
+
+                user_hours.append((attendee, hours, total_hours))
+        cal_data.append((calendar, attended_occurrences, user_hours))
+
+    context = RequestContext(request, dict(
+        cal_data=cal_data
+    ))
+
+    return render_to_response(template_name, context)
+
 
 
 @permission_required('django_attendance.change_eventattendance')
