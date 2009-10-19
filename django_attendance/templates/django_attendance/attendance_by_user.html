@@ -19,20 +19,20 @@
     <thead>
         <tr>
 			<th>Member</th>
+            <th>Total Hours</th>
 		{% for o in occurrences %}
             <th>{{ o.start|date:"m-d-Y" }}: <a class="event_link" target="{{ o.get_absolute_url }}" href="#">{{ o.title }}</a></th>
 		{% endfor %}
-            <th>Total Hours</th>
         </tr>
     </thead>
     <tbody>
     {% for user, hours, total_hours in user_hours %}
     <tr>
         <th><a href="{% url attendance_for_user user_id=user.pk %}">{{ user }}</a></td>
+		<td><em>{{ total_hours }}</em></td>
 		{% for hour in hours %}
         <td>{{ hour }}</td>
 		{% endfor %}
-		<td><em>{{ total_hours }}</em></td>
     </tr>
     {% endfor %}
     </tbody>
