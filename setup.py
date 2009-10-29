@@ -11,7 +11,7 @@ def find_packages(root):
 
 setup(
     name = 'django-attendance',
-    version = '0.1dev',
+    version = '0.1.b1',
     description = 'Attendance management for django-schedule',
     author = 'Wes Winham',
     author_email = 'winhamwr@gmail.com',

@@ -37,7 +37,7 @@ DESCRIPTION = __doc__.strip().splitlines()[0]
 AUTHOR = 'Wes Winham'
 AUTHOR_EMAIL = 'winhamwr@gmail.com'
 
-VERSION_TUPLE = (0, 1, 0, 'alpha', 1)
+VERSION_TUPLE = (0, 1, 0, 'beta', 1)
 VERSION = '%s.%s' % VERSION_TUPLE[0:2]
 RELEASE = '%s.%s.%s%.1s%s' % VERSION_TUPLE[0:5]
 
